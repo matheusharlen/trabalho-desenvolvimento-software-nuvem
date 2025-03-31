@@ -288,7 +288,15 @@ const ListaDeCompras = () => {
       console.error(err);
     }
   };
-
+  
+    // Editar categoria
+    const toggleEditCategory = (catId, currentName) => {
+        const isEditing = editingCategory[catId];
+        setEditingCategory((prev) => ({ ...prev, [catId]: !isEditing }));
+        if (!isEditing) {
+        setEditCategoryName((prev) => ({ ...prev, [catId]: currentName }));
+        }
+    };
 
 
   return (
