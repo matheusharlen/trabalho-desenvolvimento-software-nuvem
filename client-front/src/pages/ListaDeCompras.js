@@ -63,6 +63,20 @@ const ListaDeCompras = () => {
       socket.disconnect();
     };
   }, [listaId]);
+
+  
+  // Função filtro (aplica check/uncheck/all)
+  const applyFilter = (items) => {
+    if (filter === 'checked') {
+      return items.filter((item) => item.checked);
+    } else if (filter === 'unchecked') {
+      return items.filter((item) => !item.checked);
+    } else {  // 'all'
+      return items; 
+    }
+  };
+
+
   return (
 
   );
