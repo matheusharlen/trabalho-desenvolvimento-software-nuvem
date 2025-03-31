@@ -217,6 +217,39 @@ const ListaDeCompras = () => {
       console.error(err);
     }
   };
+  // A função "debounced" adia a execução até 500ms após a última chamada, evitando requisições repetitivas enquanto o usuário digita
+  const debouncedUpdateItemInCategory = useCallback(
+    debounce(async (catId, itemId, updatedItem) => {
+      try {
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/listas/${listaId}/categorias/${catId}/itens/${itemId}`,
+          updatedItem,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }, 500),
+    [listaId, token]
+  );
+  // Função para atualizar uma propriedade de um item dentro de uma categoria
+  const handleCategoryItemChange = (catIndex, itemIndex, key, value) => {
+    if (!lista) return;
+    const updatedCategorias = [...lista.categorias];
+    const cat = updatedCategorias[catIndex];
+    const updatedItem = { ...cat.itens[itemIndex], [key]: value };
+
+    if (key === 'quantidade' || key === 'preco') {
+      updatedItem.total = updatedItem.quantidade * updatedItem.preco;
+    }
+
+    cat.itens[itemIndex] = updatedItem;
+    updatedCategorias[catIndex] = cat;
+
+    setLista((prev) => ({ ...prev, categorias: updatedCategorias }));
+    debouncedUpdateItemInCategory(cat._id, updatedItem._id, updatedItem);
+  };
+
 
   return (
 
