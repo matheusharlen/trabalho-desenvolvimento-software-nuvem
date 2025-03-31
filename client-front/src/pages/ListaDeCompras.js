@@ -141,6 +141,27 @@ const ListaDeCompras = () => {
     debouncedUpdateItem(updatedItem._id, updatedItem);
   };
 
+  // Função para marcar/desmarcar item sem categoria
+  const toggleChecked = (index) => {
+    if (!lista) return;
+    const updatedItem = {
+      ...lista.itens[index],
+      checked: !lista.itens[index].checked,
+    };
+    debouncedUpdateItem(updatedItem._id, updatedItem);
+  };
+
+  // Função para deletar um item sem categoria
+  const deleteItem = async (itemId) => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/listas/${listaId}/itens/${itemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
 
   );
