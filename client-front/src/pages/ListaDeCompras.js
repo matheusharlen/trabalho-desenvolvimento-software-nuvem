@@ -288,7 +288,7 @@ const ListaDeCompras = () => {
       console.error(err);
     }
   };
-  
+
     // Editar categoria
     const toggleEditCategory = (catId, currentName) => {
         const isEditing = editingCategory[catId];
@@ -297,6 +297,38 @@ const ListaDeCompras = () => {
         setEditCategoryName((prev) => ({ ...prev, [catId]: currentName }));
         }
     };
+  // Função para atualizar o estado do nome da categoria enquanto esta sendo editado
+  const handleCategoryNameChange = (catId, newValue) => {
+    setEditCategoryName((prev) => ({ ...prev, [catId]: newValue }));
+  };
+
+  // Função para atualizar o nome da categoria
+  const updateCategoryName = async (catId) => {
+    const newName = editCategoryName[catId];
+    if (!newName || !newName.trim()) {
+      alert('O nome da categoria não pode estar vazio.');
+      return;
+    }
+    try {
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/listas/${listaId}/categorias/${catId}`,
+        { nome: newName },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLista((prev) => {
+        const novasCategorias = prev.categorias.map((c) => {
+          if (c._id === catId) {
+            return { ...c, nome: res.data.nome };
+          }
+          return c;
+        });
+        return { ...prev, categorias: novasCategorias };
+      });
+      setEditingCategory((prev) => ({ ...prev, [catId]: false }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
 
   return (
