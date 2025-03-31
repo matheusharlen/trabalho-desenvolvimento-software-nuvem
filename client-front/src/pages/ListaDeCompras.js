@@ -368,53 +368,304 @@ const ListaDeCompras = () => {
   const filteredTopLevelItems = applyFilter(lista.itens);
 
 
-  return (<div className="container py-4">
   
-    <h1 className="mb-4">{lista.nome}</h1>
+  return (
+    <div className="container py-4">
+  
+      <h1 className="mb-4">{lista.nome}</h1>
 
-    {/* ITENS SEM CATEGORIA */}
-    <section className="mb-4">
-      <h4>Itens Sem Categoria</h4>
+      {/* ITENS SEM CATEGORIA */}
+      <section className="mb-4">
+        <h4>Itens Sem Categoria</h4>
+        
+        {/* Linha para inserir item sem categoria */}
+        <div className="row g-2 mb-3">
+          <div className="col">
+            <input
+              type="text"
+              placeholder="Item sem categoria"
+              className="form-control"
+              value={novoItemSemCategoria}
+              onChange={(e) => setNovoItemSemCategoria(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addItemSemCategoria()}
+            />
+          </div>
+          <div className="col-auto">
+            <button 
+              className="btn btn-primary w-100" 
+              onClick={addItemSemCategoria}
+            >
+              Adicionar Item SEM Categoria
+            </button>
+          </div>
+        </div>
+
+        {/* Filtro de itens */}
+        <div className="row g-2 mb-3">
+          <div className="col-auto">
+            <select
+              className="form-select"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option value="all">Todos</option>
+              <option value="checked">Marcados</option>
+              <option value="unchecked">Desmarcados</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/*Criar nova categoria*/}
+      <section className="mb-4">
+        <h4>Criar Nova Categoria</h4>
+        
+        <div className="row g-2">
+          <div className="col">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Nome da categoria"
+              value={novaCategoria}
+              onChange={(e) => setNovaCategoria(e.target.value)                
+              }
+              onKeyDown={(e) => e.key === 'Enter' && addCategory()}
+            />
+          </div>
+          <div className="col-auto">
+            <button 
+              className="btn btn-success w-100" 
+              onClick={addCategory}
+            >
+              Adicionar Categoria
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Categorias */}
+      <section className="mb-4">
+        {lista.categorias.map((cat, catIndex) => {
+          const isEditing = editingCategory[cat._id] || false;
+          
+          
+          const filteredCatItems = applyFilter(cat.itens);
+          if (filter !== 'all' && filteredCatItems.length === 0) {
+            return null;
+          }
+          
+
+          return (
+            <div className="card mb-3" key={cat._id}>
+              <div className="card-body">
+                {/* Cabeçalho da categoria (nome, editar, excluir) */}
+                <div className="d-flex align-items-center mb-3">
+                  {isEditing ? (
+                    <>
+                      <input
+                        type="text"
+                        className="form-control me-2"
+                        value={editCategoryName[cat._id] || ''}
+                        onChange={(e) => handleCategoryNameChange(cat._id, e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && updateCategoryName(cat._id)}
+                        
+                      />
+                      <button
+                        className="btn btn-primary me-2"
+                        onClick={() => updateCategoryName(cat._id)}
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => {
+                          setEditingCategory((prev) => ({
+                            ...prev,
+                            [cat._id]: false,
+                          }));
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <h5 className="mb-0">{cat.nome}</h5>
+                      <button
+                        className="btn btn-link ms-3"
+                        onClick={() => toggleEditCategory(cat._id, cat.nome)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn btn-danger ms-2"
+                        onClick={() => deleteCategory(cat._id)}
+                      >
+                        Excluir Categoria
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Listagem de itens dentro da categoria */}
+                <ul className="list-group">
+                  {filteredCatItems.map((item, itemIndex) => (
+                    <li
+                      key={item._id}
+                      className="list-group-item d-flex align-items-center"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={item.checked}
+                        onChange={() => toggleCategoryItemChecked(catIndex, itemIndex)}
+                        className="me-2"
+                      />
+
+                      {/* Nome do item */}
+                      <input
+                        type="text"
+                        placeholder="Nome do Produto"
+                        value={item.nome}
+                        onChange={(e) =>
+                          handleCategoryItemChange(catIndex, itemIndex, 'nome', e.target.value)
+                        }
+                        className="form-control me-2"
+                        style={{ maxWidth: '200px' }}
+                      />
+
+                      {/* Quantidade */}
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.quantidade}
+                        onChange={(e) =>
+                          handleCategoryItemChange(catIndex, itemIndex, 'quantidade', parseInt(e.target.value))
+                        }
+                        className="form-control me-2"
+                        style={{ maxWidth: '80px' }}
+                      />
+
+                      {/* Preço */}
+                      <input
+                        type="number"
+                        min="0"
+                        value={item.preco}
+                        onChange={(e) =>
+                          handleCategoryItemChange(catIndex, itemIndex, 'preco', parseFloat(e.target.value))
+                        }
+                        className="form-control me-2"
+                        style={{ maxWidth: '80px' }}
+                      />
+
+                      {/* Total */}
+                      <span className="ms-auto me-3">
+                        Total: R${item.total?.toFixed(2) || '0.00'}
+                      </span>
+
+                      {/* Botão Excluir */}
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => deleteItemInCategory(cat._id, item._id)}
+                      >
+                        Excluir
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Campo para adicionar novo item na categoria */}
+                <div className="d-flex align-items-center mt-3">
+                  <input
+                    type="text"
+                    placeholder="Novo item na categoria"
+                    className="form-control me-2"
+                    value={novoItemNaCategoria[cat._id] || ''}
+                    onChange={(e) =>
+                      setNovoItemNaCategoria((prev) => ({
+                        ...prev,
+                        [cat._id]: e.target.value,
+                      }))
+                    }
+                    onKeyDown={(e) => e.key === 'Enter' && addItemToCategory(cat._id)}
+                  />
+                  
+                  <div className="col-auto">
+                    <button 
+                      className="btn btn-info w-100" 
+                      onClick={() => addItemToCategory(cat._id)}
+                    >
+                      Adicionar Item
+                    </button>
+                  </div>  
+                 
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
+      {/* ITENS SEM CATEGORIA (LISTAGEM) */}
+      <section className="mb-4">
+        <h4>Lista de Itens Sem Categoria</h4>
+        <ul className="list-group">
+          {filteredTopLevelItems.map((item, index) => (
+            <li key={item._id} className="list-group-item d-flex align-items-center">
+              <input
+                type="checkbox"
+                checked={item.checked}
+                onChange={() => toggleChecked(index)}
+                className="me-2"
+              />
+
+              <input
+                type="text"
+                placeholder="Nome do Produto"
+                value={item.nome}
+                onChange={(e) => handleInputChange(index, 'nome', e.target.value)}
+                className="form-control me-2"
+                style={{ maxWidth: '200px' }}
+              />
+
+              <input
+                type="number"
+                min="1"
+                value={item.quantidade}
+                onChange={(e) => handleInputChange(index, 'quantidade', parseInt(e.target.value))}
+                className="form-control me-2"
+                style={{ maxWidth: '80px' }}
+              />
+
+              <input
+                type="number"
+                min="0"
+                value={item.preco}
+                onChange={(e) => handleInputChange(index, 'preco', parseFloat(e.target.value))}
+                className="form-control me-2"
+                style={{ maxWidth: '80px' }}
+              />
+
+              <span className="ms-auto me-3">
+                Total: R${item.total?.toFixed(2) || '0.00'}
+              </span>
+
+              <button
+                className="btn btn-danger"
+                onClick={() => deleteItem(item._id)}
+              >
+                Excluir
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       
-      {/* Linha para inserir item sem categoria */}
-      <div className="row g-2 mb-3">
-        <div className="col">
-          <input
-            type="text"
-            placeholder="Item sem categoria"
-            className="form-control"
-            value={novoItemSemCategoria}
-            onChange={(e) => setNovoItemSemCategoria(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addItemSemCategoria()}
-          />
-        </div>
-        <div className="col-auto">
-          <button 
-            className="btn btn-primary w-100" 
-            onClick={addItemSemCategoria}
-          >
-            Adicionar Item SEM Categoria
-          </button>
-        </div>
-      </div>
-
-      {/* Filtro de itens */}
-      <div className="row g-2 mb-3">
-        <div className="col-auto">
-          <select
-            className="form-select"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="all">Todos</option>
-            <option value="checked">Marcados</option>
-            <option value="unchecked">Desmarcados</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-
+      <h2 className="text-end">
+        Valor Total: R${calculateTotal().toFixed(2)}
+      </h2>
+    </div>
   );
 };
+
 export default ListaDeCompras;
