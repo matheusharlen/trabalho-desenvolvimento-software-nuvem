@@ -191,3 +191,68 @@ exports.addCategory = async (req, res) => {
     res.status(500).send('Erro no servidor ao adicionar categoria (api)');
   }
 };
+
+
+
+// Adicionar item dentro de uma categoria
+exports.addItemToCategory = async (req, res) => {
+  try {
+    const { nome, quantidade, preco, checked } = req.body;
+    if (!nome) {
+      return res.status(400).json({ msg: 'O campo nome é obrigatório' });
+    }
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+
+    const categoria = lista.categorias.id(req.params.catId);
+    if (!categoria) return res.status(404).json({ msg: 'Categoria não encontrada' });
+
+    const total = quantidade * preco;
+    const novoItem = {
+      _id: new mongoose.Types.ObjectId(),
+      nome,
+      quantidade,
+      preco,
+      total,
+      checked,
+    };
+    categoria.itens.push(novoItem);
+    await lista.save();
+    res.json(novoItem);
+  } catch (err) {
+    console.error('Erro ao adicionar item na categoria:', err);
+    res.status(500).send('Erro no servidor ao adicionar item na categoria (api)');
+  }
+};
+
+
+// Atualizar item dentro de uma categoria
+exports.updateItemInCategory = async (req, res) => {
+  const { nome, quantidade, preco, checked } = req.body;
+  try {
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+    const categoria = lista.categorias.id(req.params.catId);
+    if (!categoria) return res.status(404).json({ msg: 'Categoria não encontrada' });
+
+    const item = categoria.itens.id(req.params.itemId);
+    if (!item) return res.status(404).json({ msg: 'Item não encontrado na categoria' });
+
+    item.nome = nome !== undefined ? nome : item.nome;
+    item.quantidade = quantidade !== undefined ? quantidade : item.quantidade;
+    item.preco = preco !== undefined ? preco : item.preco;
+    item.total = item.quantidade * item.preco;
+    item.checked = checked !== undefined ? checked : item.checked;
+
+    await lista.save();
+    res.json(item);
+  } catch (err) {
+    res.status(500).send('Erro no servidor ao atualizar item na categoria (api)');
+  }
+};
