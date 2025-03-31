@@ -1,0 +1,36 @@
+import React, { createContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
+
+// Cria um contexto para gerenciar autenticação
+export const AuthContext = createContext();
+
+// Encapsula a lógica de autenticação
+export const AuthProvider = ({ children }) => {
+  // Armazerna o token e o nome do usuário
+  const [authData, setAuthData] = useState({
+    token: localStorage.getItem('token'),
+    userName: '',
+  });
+  // Decodifica o token e atualiza o nome do usuário quando o token muda
+  const { token } = authData;
+  useEffect(() => {
+    if (token) {
+      try {
+        // Decodigica o token JWT
+        const decoded = jwtDecode(token);
+        setAuthData(prevState => ({
+          ...prevState,
+          userName: decoded.user.nome,
+        }));
+      } catch (error) {
+        console.error('Erro ao decodificar o token:', error);
+        setAuthData({ token: null, userName: '' }); // Limpa os dados de autenticação em caso de erro
+        localStorage.removeItem('token'); // Remove o token invalido do local storage
+      }
+    }
+  }, [token]);
+
+  return (
+
+  );
+};  
