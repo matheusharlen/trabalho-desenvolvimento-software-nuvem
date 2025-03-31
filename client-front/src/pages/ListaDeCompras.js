@@ -86,7 +86,7 @@ const ListaDeCompras = () => {
       return items; 
     }
   };
-  
+
 
   // Adiciona um item sem categoria
   const addItemSemCategoria = async () => {
@@ -126,6 +126,20 @@ const ListaDeCompras = () => {
     [listaId, token]
   );
 
+  // Função para atualizar um item sem categoria
+  const handleInputChange = (index, key, value) => {
+    if (!lista) return;
+    const updatedItem = { ...lista.itens[index], [key]: value };
+    if (key === 'quantidade' || key === 'preco') {
+      updatedItem.total = updatedItem.quantidade * updatedItem.preco;
+    }
+    setLista((prev) => {
+      const novosItens = [...prev.itens];
+      novosItens[index] = updatedItem;
+      return { ...prev, itens: novosItens };
+    });
+    debouncedUpdateItem(updatedItem._id, updatedItem);
+  };
 
   return (
 
