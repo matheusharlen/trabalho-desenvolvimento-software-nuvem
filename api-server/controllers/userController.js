@@ -128,3 +128,21 @@ exports.updateUserPassword = async (req, res) => {
     res.status(500).send('Erro ao atualizar a senha no servidor');
   }
 };
+
+// Deleta a conta do usuário
+exports.deleteUserAccount = async (req, res) => {
+    try {
+      const userId = req.user.id;
+  
+      // Exclui todas as listas associadas ao usuário
+      await Lista.deleteMany({ usuarioId: userId });
+  
+      // Exclui o usuário
+      await User.findByIdAndDelete(userId);
+  
+      res.json({ msg: 'Conta excluída com sucesso' });
+    } catch (err) {
+      console.error('Erro ao excluir conta do usuário:', err);
+      res.status(500).send('Erro ao excluir coonta no servidor');
+    }
+  };
