@@ -48,3 +48,22 @@ exports.updateLista = async (req, res) => {
     res.status(500).send('Erro no servidor ao atualizar lista');
   }
 };
+
+
+
+// Deleta a lista e todos os itens dentro dela
+exports.deleteLista = async (req, res) => {
+    try {
+      let lista = await Lista.findById(req.params.id);
+      if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+      if (lista.usuarioId.toString() !== req.user.id.toString()) {
+        return res.status(401).json({ msg: 'Não autorizado' });
+      }
+      await Lista.findByIdAndDelete(req.params.id);
+      req.io.to(`user_${req.user.id}`).emit('lista_removida', { id: req.params.id });
+      res.json({ msg: 'Lista removida com sucesso' });
+    } catch (err) {
+      console.error('Erro ao deletar lista:', err);
+      res.status(500).send('Erro  ao deletar a lista no servidor (api)');
+    }
+  };
