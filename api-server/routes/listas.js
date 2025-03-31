@@ -24,4 +24,5 @@ router.delete('/:id/categorias/:catId', auth, listaController.deleteCategory);
 router.post('/:id/categorias/:catId/itens', auth, listaController.addItemToCategory);
 router.put('/:id/categorias/:catId/itens/:itemId', auth, listaController.updateItemInCategory);
 router.delete('/:id/categorias/:catId/itens/:itemId', auth, listaController.deleteItemInCategory);
+
 module.exports = router;
