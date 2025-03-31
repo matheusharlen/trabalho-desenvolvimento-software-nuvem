@@ -1,1 +1,20 @@
-a
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .btn {
+    margin-right: 10px;
+  }
+  
+  .mt-4 {
+    margin-top: 1.5rem;
+  }
+  
