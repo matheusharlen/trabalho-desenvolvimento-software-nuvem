@@ -115,3 +115,30 @@ exports.addItem = async (req, res) => {
     res.status(500).send('Erro no servidor ao adicionar item (api)');
   }
 };
+
+
+// Atualizar item sem categoria
+exports.updateItem = async (req, res) => {
+  const { nome, quantidade, preco, checked } = req.body;
+  try {
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+    const item = lista.itens.id(req.params.itemId);
+    if (!item) return res.status(404).json({ msg: 'Item não encontrado' });
+
+    item.nome = nome !== undefined ? nome : item.nome;
+    item.quantidade = quantidade !== undefined ? quantidade : item.quantidade;
+    item.preco = preco !== undefined ? preco : item.preco;
+    item.total = item.quantidade * item.preco;
+    item.checked = checked !== undefined ? checked : item.checked;
+
+    await lista.save();
+    req.io.to(`lista_${lista._id}`).emit('item_atualizado', item);
+    res.json(item);
+  } catch (err) {
+    res.status(500).send('Erro no servidor ao atualizar item da lista (api)');
+  }
+};
