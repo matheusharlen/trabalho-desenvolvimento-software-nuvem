@@ -329,6 +329,24 @@ const ListaDeCompras = () => {
       console.error(err);
     }
   };
+  // Função para deletar uma categoria
+  const deleteCategory = async (catId) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta categoria e todos os itens dentro dela?')) {
+      return;
+    }
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/listas/${listaId}/categorias/${catId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLista((prev) => ({
+        ...prev,
+        categorias: prev.categorias.filter((c) => c._id !== catId),
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
 
   return (
