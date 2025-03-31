@@ -64,6 +64,17 @@ const ListaDeCompras = () => {
     };
   }, [listaId]);
 
+  // Busca lista no servidor
+  const fetchLista = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/listas/${listaId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLista(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   
   // Função filtro (aplica check/uncheck/all)
   const applyFilter = (items) => {
