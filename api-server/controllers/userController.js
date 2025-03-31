@@ -56,3 +56,17 @@ exports.loginUser = async (req, res) => {
     res.status(500).send('Erro ao fazer login no servidor');
   }
 };
+
+// Busca o perfil do usuário
+exports.getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-senha');
+    if(!user){
+      return res.status(404).json({ msg: 'Usuário não encontrado'});
+    }
+    res.json(user);
+  } catch (err) {
+    console.error('Erro ao obeter o perfil do usuário');
+    res.status(500).send('Erro ao obter nome usuário no servidor');
+  }
+};
