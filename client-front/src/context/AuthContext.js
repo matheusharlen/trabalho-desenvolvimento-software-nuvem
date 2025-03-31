@@ -29,6 +29,24 @@ export const AuthProvider = ({ children }) => {
       }
     }
   }, [token]);
+  // Funçao para fazer login. Armazena token e nome do usuário no local storage
+  const login = (token) => {
+    localStorage.setItem('token', token);
+    const decoded = jwtDecode(token);
+    setAuthData({ token, userName: decoded.user.nome });
+  };
+  // Função para fazer logout removendo o token e limpando os dados do usuário
+  const logout = () => {
+    localStorage.removeItem('token');
+    setAuthData({ token: null, userName: '' });
+  };
+  // Função para atualizar o nome do usuário 
+  const updateUserName = (newName) => {
+    setAuthData((prevState) => ({
+      ...prevState,
+      userName: newName,
+    }));
+  };
 
   return (
 
