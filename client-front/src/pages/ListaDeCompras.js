@@ -250,6 +250,46 @@ const ListaDeCompras = () => {
     debouncedUpdateItemInCategory(cat._id, updatedItem._id, updatedItem);
   };
 
+  // Função para alternar o estado "checked" de um item dentro de uma categoria
+  const toggleCategoryItemChecked = (catIndex, itemIndex) => {
+    if (!lista) return;
+    const updatedCategorias = [...lista.categorias];
+    const cat = updatedCategorias[catIndex];
+    const item = cat.itens[itemIndex];
+    const updatedItem = { ...item, checked: !item.checked };
+
+    cat.itens[itemIndex] = updatedItem;
+    updatedCategorias[catIndex] = cat;
+
+    setLista((prev) => ({ ...prev, categorias: updatedCategorias }));
+    debouncedUpdateItemInCategory(cat._id, updatedItem._id, updatedItem);
+  };
+
+  // Função para deletar um item dentro de uma categoria
+  const deleteItemInCategory = async (catId, itemId) => {
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/listas/${listaId}/categorias/${catId}/itens/${itemId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLista((prev) => {
+        const novasCategorias = prev.categorias.map((c) => {
+          if (c._id === catId) {
+            return {
+              ...c,
+              itens: c.itens.filter((i) => i._id !== itemId),
+            };
+          }
+          return c;
+        });
+        return { ...prev, categorias: novasCategorias };
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
 
   return (
 
