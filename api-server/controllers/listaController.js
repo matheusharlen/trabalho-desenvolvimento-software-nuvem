@@ -280,3 +280,29 @@ exports.deleteItemInCategory = async (req, res) => {
     res.status(500).send('Erro no servidor');
   }
 };
+
+// Atualizar nome da categoria
+exports.updateCategory = async (req, res) => {
+  try {
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+    const categoria = lista.categorias.id(req.params.catId);
+    if (!categoria) return res.status(404).json({ msg: 'Categoria não encontrada' });
+
+    const { nome } = req.body;
+    if (!nome || !nome.trim()) {
+      return res.status(400).json({ msg: 'O campo nome é obrigatório para renomear a categoria' });
+    }
+
+    categoria.nome = nome;
+    await lista.save();
+
+    res.json(categoria);
+  } catch (err) {
+    console.error('Erro ao atualizar categoria:', err);
+    res.status(500).send('Erro no servidor ao atualizar categoria');
+  }
+};
