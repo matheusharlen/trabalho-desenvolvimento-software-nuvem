@@ -47,8 +47,10 @@ export const AuthProvider = ({ children }) => {
       userName: newName,
     }));
   };
-
+   // Fornece o contexto de autenticação para componentes filhos
   return (
-
+    <AuthContext.Provider value={{ authData, login, logout,updateUserName }}>
+      {children}
+    </AuthContext.Provider>
   );
 };  
