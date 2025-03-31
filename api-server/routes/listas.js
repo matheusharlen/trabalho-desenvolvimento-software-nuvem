@@ -20,4 +20,8 @@ router.post('/:id/categorias', auth, listaController.addCategory);
 router.put('/:id/categorias/:catId', auth, listaController.updateCategory);
 router.delete('/:id/categorias/:catId', auth, listaController.deleteCategory);
 
+// Itens DENTRO de uma categoria
+router.post('/:id/categorias/:catId/itens', auth, listaController.addItemToCategory);
+router.put('/:id/categorias/:catId/itens/:itemId', auth, listaController.updateItemInCategory);
+router.delete('/:id/categorias/:catId/itens/:itemId', auth, listaController.deleteItemInCategory);
 module.exports = router;
