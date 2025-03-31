@@ -256,3 +256,27 @@ exports.updateItemInCategory = async (req, res) => {
     res.status(500).send('Erro no servidor ao atualizar item na categoria (api)');
   }
 };
+
+// Deletar item dentro de uma categoria
+exports.deleteItemInCategory = async (req, res) => {
+  try {
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id.toString()) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+    const categoria = lista.categorias.id(req.params.catId);
+    if (!categoria) return res.status(404).json({ msg: 'Categoria não encontrada' });
+
+    const item = categoria.itens.id(req.params.itemId);
+    if (!item) return res.status(404).json({ msg: 'Item não encontrado na categoria' });
+
+    categoria.itens.pull(item);
+    await lista.save();
+
+    res.json({ msg: 'Item da categoria removido com sucesso' });
+  } catch (err) {
+    console.error('Erro ao deletar item da categoria:', err);
+    res.status(500).send('Erro no servidor');
+  }
+};
