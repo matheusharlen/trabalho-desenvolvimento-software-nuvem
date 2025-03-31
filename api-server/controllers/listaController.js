@@ -83,3 +83,35 @@ exports.deleteLista = async (req, res) => {
     }
   };
   
+
+
+// Adicionar item sem categoria
+exports.addItem = async (req, res) => {
+  const { nome, quantidade, preco, checked } = req.body;
+  try {
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+    if (!nome) {
+      return res.status(400).json({ msg: 'O campo nome é obrigatório' });
+    }
+    const total = quantidade * preco;
+    const newItem = {
+      _id: new mongoose.Types.ObjectId(),
+      nome,
+      quantidade,
+      preco,
+      total,
+      checked,
+    };
+    lista.itens.push(newItem);
+    await lista.save();
+    req.io.to(`lista_${lista._id}`).emit('item_adicionado', newItem);
+    res.json(newItem);
+  } catch (err) {
+    console.error('Erro ao adicionar item:', err);
+    res.status(500).send('Erro no servidor ao adicionar item (api)');
+  }
+};
