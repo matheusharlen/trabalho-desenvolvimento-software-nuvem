@@ -349,6 +349,25 @@ const ListaDeCompras = () => {
   };
 
 
+  // Função para calcular o valor total da lista
+  const calculateTotal = () => {
+    if (!lista) return 0;
+    let totalSemCat = lista.itens.reduce((sum, item) => sum + (item.total || 0), 0);
+    let totalCategorias = 0;
+    for (const cat of lista.categorias) {
+      totalCategorias += cat.itens.reduce((sum, i) => sum + (i.total || 0), 0);
+    }
+    return totalSemCat + totalCategorias;
+  };
+
+  // Caso ainda não tenha carregado a lista, uma espera é exibida para o usuário
+  if (!lista) {
+    return <div>Carregando...</div>;
+  }
+
+  const filteredTopLevelItems = applyFilter(lista.itens);
+
+
   return (
 
   );
