@@ -86,6 +86,45 @@ const ListaDeCompras = () => {
       return items; 
     }
   };
+  
+
+  // Adiciona um item sem categoria
+  const addItemSemCategoria = async () => {
+    if (!novoItemSemCategoria.trim()) {
+      alert('Digite um nome de item para adicionar.');
+      return;
+    }
+    const newItem = {
+      nome: novoItemSemCategoria,
+      quantidade: 1,
+      preco: 0,
+      checked: false,
+    };
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/listas/${listaId}/itens`, newItem, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNovoItemSemCategoria('');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Edição de itens sem categoria (debounce)
+  const debouncedUpdateItem = useCallback(
+    debounce(async (itemId, updatedItem) => {
+      try {
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/listas/${listaId}/itens/${itemId}`,
+          updatedItem,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }, 500),
+    [listaId, token]
+  );
 
 
   return (
