@@ -368,7 +368,52 @@ const ListaDeCompras = () => {
   const filteredTopLevelItems = applyFilter(lista.itens);
 
 
-  return (
+  return (<div className="container py-4">
+  
+    <h1 className="mb-4">{lista.nome}</h1>
+
+    {/* ITENS SEM CATEGORIA */}
+    <section className="mb-4">
+      <h4>Itens Sem Categoria</h4>
+      
+      {/* Linha para inserir item sem categoria */}
+      <div className="row g-2 mb-3">
+        <div className="col">
+          <input
+            type="text"
+            placeholder="Item sem categoria"
+            className="form-control"
+            value={novoItemSemCategoria}
+            onChange={(e) => setNovoItemSemCategoria(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && addItemSemCategoria()}
+          />
+        </div>
+        <div className="col-auto">
+          <button 
+            className="btn btn-primary w-100" 
+            onClick={addItemSemCategoria}
+          >
+            Adicionar Item SEM Categoria
+          </button>
+        </div>
+      </div>
+
+      {/* Filtro de itens */}
+      <div className="row g-2 mb-3">
+        <div className="col-auto">
+          <select
+            className="form-select"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="all">Todos</option>
+            <option value="checked">Marcados</option>
+            <option value="unchecked">Desmarcados</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
 
   );
 };
