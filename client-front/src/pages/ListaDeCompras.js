@@ -184,6 +184,40 @@ const ListaDeCompras = () => {
     }
   };
 
+  // Adicionar item a uma categoria
+  const addItemToCategory = async (catId) => {
+    const nomeItem = novoItemNaCategoria[catId];
+    if (!nomeItem || !nomeItem.trim()) {
+      alert('Digite um nome de item para esta categoria.');
+      return;
+    }
+    const newItem = {
+      nome: nomeItem,
+      quantidade: 1,
+      preco: 0,
+      checked: false,
+    };
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/listas/${listaId}/categorias/${catId}/itens`,
+        newItem,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLista((prev) => {
+        const novasCategorias = prev.categorias.map((cat) => {
+          if (cat._id === catId) {
+            return { ...cat, itens: [...cat.itens, res.data] };
+          }
+          return cat;
+        });
+        return { ...prev, categorias: novasCategorias };
+      });
+      setNovoItemNaCategoria((prev) => ({ ...prev, [catId]: '' }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
 
   );
