@@ -32,3 +32,27 @@ exports.registerUser = async (req, res) => {
     res.status(500).send('Erro ao criar usuário no servidor');
   }
 };
+
+// Login de usuário
+exports.loginUser = async (req, res) => {
+  const { email, senha } = req.body;
+
+  try {
+    // Verifica o usuário
+    let user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ msg: 'Credenciais inválidas' });
+
+    // Verifica a senha
+    const isMatch = await bcrypt.compare(senha, user.senha);
+    if (!isMatch) return res.status(400).json({ msg: 'Credenciais inválidas' });
+
+    // Retorna o JWT
+    const payload = { user: { id: user.id, nome: user.nome } };
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2d' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
+  } catch (err) {
+    res.status(500).send('Erro ao fazer login no servidor');
+  }
+};
