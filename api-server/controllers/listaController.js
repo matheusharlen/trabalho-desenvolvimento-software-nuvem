@@ -164,3 +164,30 @@ exports.deleteItem = async (req, res) => {
     res.status(500).send('Erro no servidor');
   }
 };
+
+// Adicionar categoria
+exports.addCategory = async (req, res) => {
+  try {
+    const { nome } = req.body;
+    if (!nome) {
+      return res.status(400).json({ msg: 'O campo nome é obrigatório' });
+    }
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+
+    const novaCategoria = {
+      _id: new mongoose.Types.ObjectId(),
+      nome,
+      itens: [],
+    };
+    lista.categorias.push(novaCategoria);
+    await lista.save();
+    res.json(novaCategoria);
+  } catch (err) {
+    console.error('Erro ao adicionar categoria:', err);
+    res.status(500).send('Erro no servidor ao adicionar categoria (api)');
+  }
+};
