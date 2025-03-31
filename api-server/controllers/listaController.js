@@ -67,3 +67,19 @@ exports.deleteLista = async (req, res) => {
       res.status(500).send('Erro  ao deletar a lista no servidor (api)');
     }
   };
+
+
+  // Buscar lista por ID
+  exports.getListaById = async (req, res) => {
+    try {
+      const lista = await Lista.findById(req.params.id);
+      if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+      if (lista.usuarioId.toString() !== req.user.id) {
+        return res.status(401).json({ msg: 'Não autorizado' });
+      }
+      res.json(lista);
+    } catch (err) {
+      res.status(500).send('Erro no servidor ao obter lista (api)');
+    }
+  };
+  
