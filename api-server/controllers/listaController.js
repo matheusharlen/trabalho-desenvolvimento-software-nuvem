@@ -306,3 +306,27 @@ exports.updateCategory = async (req, res) => {
     res.status(500).send('Erro no servidor ao atualizar categoria');
   }
 };
+
+//  Deletar a categoria e itens dentro dela
+exports.deleteCategory = async (req, res) => {
+  try {
+    let lista = await Lista.findById(req.params.id);
+    if (!lista) return res.status(404).json({ msg: 'Lista não encontrada' });
+    if (lista.usuarioId.toString() !== req.user.id.toString()) {
+      return res.status(401).json({ msg: 'Não autorizado' });
+    }
+
+    const categoria = lista.categorias.id(req.params.catId);
+    if (!categoria) return res.status(404).json({ msg: 'Categoria não encontrada' });
+
+    // Remove a categoria inteira do array
+    lista.categorias.pull(categoria);
+    await lista.save();
+
+    res.json({ msg: 'Categoria removida com sucesso' });
+  } catch (err) {
+    console.error('Erro ao deletar categoria:', err);
+    res.status(500).send('Erro no servidor ao deletar categoria');
+  }
+};
+
